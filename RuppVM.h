@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <string.h>
 #include <time.h>
 
@@ -17,7 +18,7 @@ typedef struct VM_Sched VM_Sched;
 typedef struct VM_Memory VM_Memory;
 typedef struct VM_State VM_State;
 
-typedef VM_Operand
+struct VM_Operand
 {
   union
   {
@@ -45,7 +46,7 @@ struct VM_Stack
    VM_Operand *root;
    VM_Operand *head;
    VM_Operand *next;
-   VM_Opernad *prev;
+   VM_Operand *prev;
 };
 
 
@@ -53,7 +54,7 @@ struct VM_Thread
 {
    ssize_t thread_id;
    VM_Operand *entry_point;
-   VM_Opernad *entry_args;
+   VM_Operand *entry_args;
 
    enum
    {

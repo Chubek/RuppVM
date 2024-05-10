@@ -1,66 +1,71 @@
 ; Stack operations
-push_word	( &word -- vword )				; Push a word constant onto the stack
-push_addr	( &addr -- vaddr )				; Push a stack address onto the stack 
-push_mem	( &mem -- vmem )				; Push a memory address onto the stack
-lit_num		( vtos -- vword )				; Pun vtos to vword
-lit_mem		( vtos -- vmem )				; Pun vtos to vmem
-lit_addr 	( vtos -- vaddr )				; Pun vtos to vaddr
-dup             ( vtos -- vtos1 vtos2)  			; Duplicate the top value on the stack
-drop            ( vtos -- )        				; Remove the top value from the stack
-swap            ( vtos1 vtos2 -- vtos2 vtos1)			; Swap the top two values on the stack
-over            ( vtos1 vtos2 -- vtos1 vtos2 vtos1) 		; Duplicate the second item on the stack over the top item
-rot2            ( vtos1 vtos2 -- vtos2 vtos1) 			; Rotate the top two stack values
-rot3            ( vtos1 vtos2 vtos3 -- vtos2 vtos3 vtos1)	; Rotate the top three stack values
-pick            ( vword -- v)       				; Copy the nth item from the top of the stack to vword
+push_word	( &word -- vword )			  ; Push a word constant onto the stack
+push_addr	( &addr -- vaddr )			  ; Push a stack address onto the stack 
+push_mem	( &mem -- vmem )			  ; Push a memory address onto the stack
+lit_num		( vtos -- vword )			  ; Pun vtos to vword
+lit_mem		( vtos -- vmem )			  ; Pun vtos to vmem
+lit_addr 	( vtos -- vaddr )			  ; Pun vtos to vaddr
+dup             ( vtos -- vtos1 vtos2)  		  ; Duplicate the top value on the stack
+drop            ( vtos -- )        			  ; Remove the top value from the stack
+swap            ( vtos1 vtos2 -- vtos2 vtos1)		  ; Swap the top two values on the stack
+over            ( vtos1 vtos2 -- vtos1 vtos2 vtos1) 	  ; Duplicate the second item on the stack over the top item
+rot2            ( vtos1 vtos2 -- vtos2 vtos1) 		  ; Rotate the top two stack values
+rot3            ( vtos1 vtos2 vtos3 -- vtos2 vtos3 vtos1) ; Rotate the top three stack values
+pick            ( vword -- v)       			  ; Copy the nth item from the top of the stack to vword
+argnp		( vword -- vmem )			  ; Get a ref of the nth argument (nth item off fpTOS)
+argnc		( vword -- vtos )			  ; Get a copy of the nth agument (nth item off fpTOS)
+id_static	( vtos -- vowrd )			  ; Get the static memory address of an object
+id_dynamic	( vtos -- vword ) 			  ; Get the dynamic memory address of an object
 
 ; Bless operations
-; Todo
+bless_static	( vaddr vword1 vword2 -- vmem )		 ; Bless vword1 items starting from vaddr, tag vword2 returns handle as vmem
+bless_dynamic	( vmem1 vword1 vword2 -- vmem2 )	 ; The dynamic, memory-based bless
+bless_dup	( vmem1 -- vmem2 )			 ; Duplicate blessed bundle
 
 ; Control flow operations
-call		( vaddr vword --  )    				; Call function at address vaddr, passing  vword items on stack
-jmp             ( vaddr --  )          				; Perform an unconditional jump to address vaddr
-jmpz		( vaddr vtos -- )				; Jump to vaddr if vtos is 0
-jmpnz		( vaddr vtos -- )				: Jump to vaddr if vtos is not 0
-jmpeq		( vaddr vtos1 vtos2 -- )  			; Jump to vaddr if vtos1 equals vtos2
-jmpne		( vaddr vtos1 vtos2 -- )			; Jump to vaddr if vtos1 does not equal vtos2
-jmplt		( vaddr vtos1 vtos2 -- )			; Jump to vaddr if vtos1 is lesser than vtos2
-jmple		( vaddr vtos1 vtos2 -- )			; Jump to vaddr if vtos1 is lesser than, or equal to, vtos2
-jmpgt		( vaddr vtos1 vtos2 -- )			; Jump to vaddr if vtos1 is greater than vtos2
-jmpge		( vaddr vtos1 vtos2 -- )			; Jump to vaddr if vtos1 is greater than, or equal to, vtos2
-enter_fr	(  --  )					; Enter local frame, and create a new stack frame
-leave_fr	(  --  )					; Leave local frame, and discard the old stack frame
-enter_cz	(  --  )					; Entering critical execution zone
-exit_cz		(  --  )					; Exiting critical execution zone
-nop		(  --  )               				; No operation
-unwind		(  --  )					; Unwind the stack unconditionally
-unwindz		( vtos -- )					; Unwind if vtos if 0
-unwindnz	( vtos -- )					; Unwind if vtos not 0
-throw_static	( vaddr -- )					; Throw static exception
-throw_dynamic   ( vmem -- )					; Throw dynamic exception
+call		( vaddr vword --  )    			; Call function at address vaddr, passing  vword items on stack
+jmp             ( vaddr --  )          		        ; Perform an unconditional jump to address vaddr
+jmpz		( vaddr vtos -- )		 	; Jump to vaddr if vtos is 0
+jmpnz		( vaddr vtos -- )			: Jump to vaddr if vtos is not 0
+jmpeq		( vaddr vtos1 vtos2 -- )  		; Jump to vaddr if vtos1 equals vtos2
+jmpne		( vaddr vtos1 vtos2 -- )		; Jump to vaddr if vtos1 does not equal vtos2
+jmplt		( vaddr vtos1 vtos2 -- )		; Jump to vaddr if vtos1 is lesser than vtos2
+jmple		( vaddr vtos1 vtos2 -- )		; Jump to vaddr if vtos1 is lesser than, or equal to, vtos2
+jmpgt		( vaddr vtos1 vtos2 -- )		; Jump to vaddr if vtos1 is greater than vtos2
+jmpge		( vaddr vtos1 vtos2 -- )		; Jump to vaddr if vtos1 is greater than, or equal to, vtos2
+enter_fr	(  --  )				; Enter local frame, and create a new stack frame
+leave_fr	(  --  )				; Leave local frame, and discard the old stack frame
+enter_cz	(  --  )				; Entering critical execution zone
+exit_cz		(  --  )				; Exiting critical execution zone
+nop		(  --  )               			; No operation
+unwind		(  --  )				; Unwind the stack unconditionally
+unwindz		( vtos -- )				; Unwind if vtos if 0
+unwindnz	( vtos -- )				; Unwind if vtos not 0
+throw_static	( vaddr -- )				; Throw static exception
+throw_dynamic   ( vmem -- )				; Throw dynamic exception
 
 ; Arithmetic operations
-add		( vtos1 vtos2 -- vtos )				; Add vtos1 to vtos2
-sub		( vtos1 vtos2 -- vtos )				; Subtract vtos2 from vtos1
-subr		( vtos1 vtos2 -- vtos ) 			; Subtract vtos1 from vtos2
-mul		( vtos1 vtos2 -- vtos )				; Multiply vtos1 with vtos2
-div		( vtos1 vtos2 -- vtos )				; Divide vtos1 by vtos2
-mod		( vtos1 vtos2 -- vtos )				; Modulo of vtos1 by vtos2 division
-and		( vtos1 vtos2 -- vtos )				; Bitwise-and vtos1 with vtos2
-or		( vtos1 vtos2 -- vtos )				; Bitwise-or vtos1 with vtos2
-xor 		( vtos1 vtos2 -- vtos )				; Bitwise-xor vtos1 with vtos2
-shr		( vtos1 vtos2 -- vtos )				; Right-shift vtos1 vtos2 times
-shl		( vtos1 vtos2 -- vtos )				; Left-shift vtos1 vtos2 times
+add		( vtos1 vtos2 -- vtos )			; Add vtos1 to vtos2
+sub		( vtos1 vtos2 -- vtos )			; Subtract vtos2 from vtos1
+subr		( vtos1 vtos2 -- vtos ) 		; Subtract vtos1 from vtos2
+mul		( vtos1 vtos2 -- vtos )			; Multiply vtos1 with vtos2
+div		( vtos1 vtos2 -- vtos )			; Divide vtos1 by vtos2
+mod		( vtos1 vtos2 -- vtos )			; Modulo of vtos1 by vtos2 division
+and		( vtos1 vtos2 -- vtos )			; Bitwise-and vtos1 with vtos2
+or		( vtos1 vtos2 -- vtos )			; Bitwise-or vtos1 with vtos2
+xor 		( vtos1 vtos2 -- vtos )			; Bitwise-xor vtos1 with vtos2
+shr		( vtos1 vtos2 -- vtos )			; Right-shift vtos1 vtos2 times
+shl		( vtos1 vtos2 -- vtos )			; Left-shift vtos1 vtos2 times
 
 ; Thread operations
-mk_thrd	        ( vmem1 vword -- vmem2 )       			; Spawn thread with vmem1 as entrypoint, with vword params
-mk_thrd_ext	( vmem1 -- vmem2 )				; Spawn thread with external function at vmem1 as entry point
-join_thrd	( vmem --   )	 				; Wait until thread at vmem joins
-wait_thrd	( -- )						; Wait until current thread finishes
-yield_thrd	( -- )						; Yield the execution of current thread of execution
-req_lock	( vaddr -- vmem )				; Request lock at zone labeled by vaddr, get vmem as handle
-acc_lock	( vmem -- )					; Acquire lock identified by handle vmem
-rel_lock	( vmem -- )					; Release lock identified by handle vmem
-
+mk_thrd	        ( vmem1 vword -- vmem2 )       		; Spawn thread with vmem1 as entrypoint, with vword params
+mk_thrd_ext	( vmem1 -- vmem2 )			; Spawn thread with external function at vmem1 as entry point
+join_thrd	( vmem --   )	 			; Wait until thread at vmem joins
+wait_thrd	( -- )					; Wait until current thread finishes
+yield_thrd	( -- )					; Yield the execution of current thread of execution
+req_lock	( vaddr -- vmem )			; Request lock at zone labeled by vaddr, get vmem as handle
+acc_lock	( vmem -- )				; Acquire lock identified by handle vmem
+rel_lock	( vmem -- )				; Release lock identified by handle vmem
 
 ; Memory & GC Operations
 mem_req		( vword -- vmem )			; Request memory vword size in bytes
@@ -87,7 +92,7 @@ call_ext_ret	( vmem1 -- vtos )	 		; Call registered external function with ident
 call_ext_noret	( vmem -- )		 		; Call regeistered external function with identifier vword, returning none
 call_extv_ret	( vmem vword -- vtos )			; call_ext_ret for variadic functions with vword args
 call_extv_noret	( vmem vword -- )			; call_ext_noret for variadic functions with vword args
-syscall		( vword1 vword2 -- vtos )		; Make system call to nr vword1, passing vword2 args, result vtos (UNIX only)
+mk_syscall	( vword1 vword2 -- vtos )		; Make system call to nr vword1, passing vword2 args, result vtos (UNIX only)
 
 
 

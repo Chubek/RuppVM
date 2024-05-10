@@ -10,21 +10,23 @@
 #include <string.h>
 #include <time.h>
 
+typedef uint64_t vm_ident_t;
 
-typedef struct VM_Operand VM_Operand;
-typedef struct VM_Stack VM_Stack;
-typedef struct VM_Thread VM_Thread;
-typedef struct VM_Sched VM_Sched;
-typedef struct VM_Memory VM_Memory;
-typedef struct VM_State VM_State;
+typedef struct VM_Operand 	VM_Operand;
+typedef struct VM_Stack 	VM_Stack;
+typedef struct VM_Thread 	VM_Thread;
+typedef struct VM_Sched 	VM_Sched;
+typedef struct VM_Arena 	VM_Arena;
+typedef struct VM_Memory 	VM_Memory;
+typedef struct VM_State 	VM_State;
 
 struct VM_Operand
 {
   union
   {
-    uintptr_t mem_value;
-    intmax_t const_value;
-    ptrdiff_t addr_value;
+    uintptr_t 	mem_value;
+    intmax_t 	const_value;
+    ptrdiff_t 	addr_value;
   };
 
   enum
@@ -34,6 +36,8 @@ struct VM_Operand
     OP_ADDR,
   }
   kind;
+
+  vm_ident_t stack_ident;
 
   bool is_alive;
   bool is_thread_local;
@@ -45,16 +49,14 @@ struct VM_Stack
 {
    VM_Operand *root;
    VM_Operand *head;
-   VM_Operand *next;
-   VM_Operand *prev;
 };
 
 
 struct VM_Thread
 {
-   ssize_t thread_id;
-   VM_Operand *entry_point;
-   VM_Operand *entry_args;
+   ssize_t 	thread_id;
+   VM_Operand 	*entry_point;
+   VM_Operand 	*entry_args;
 
    enum
    {
@@ -70,27 +72,50 @@ struct VM_Thread
 
 struct VM_Sched
 {
-  VM_Thread *head;
-  VM_Thread *current;
-  size_t num_threads;
+  VM_Thread 	*head;
+  VM_Thread 	*current;
+  size_t 	num_threads;
+};
 
-  time_t last_sync;
+struct VM_Arena
+{
+   uint8_t 	*buffer;
+   size_t 	capacity;
+   size_t 	used;
+   VM_Arena 	*next;
 };
 
 struct VM_Memory
 {
-   ptrdiff_t mem_start;
-   ptrdiff_t mem_end;
-
-   time_t last_collect;
+   VM_Arena *root;
+   VM_Arena *head;
 };
 
 struct VM_State
 {
-   VM_Sched *sched;
-   VM_Memory *memory;
-   VM_Stack *stack;
+   VM_Sched 	*sched;
+   VM_Memory 	*memory;
+   VM_Stack 	*stack;
 };
 
+vm_ident_t 	vm_stack_push_const(VM_Stack *stack, intmax_t const_value);
+vm_ident_t 	vm_stack_push_addr(VM_Stack *stack, ptrdiff_t addr_value);
+vm_ident_t 	vm_stack_push_mem(VM_Stack *stack, uintptr_t mem_value);
+VM_Operand 	*vm_stack_pop(VM_Stack *stack);
+VM_Operand 	*vm_stack_get(VM_Stack *stack, vm_ident_t item_ident);
+void 		vm_stack_dump(VM_Stack *stack);
+
+VM_Arena 	*vm_arena_new(size_t size);
+void 		vm_arena_dump_all(VM_Arena *arena);
+uintptr_t 	vm_arena_allocate(VM_Arena *arena);
+
+void 		vm_memory_init(VM_Memory *memory);
+void 		vm_memory_cleanup(VM_Memory *memory);
+uintptr_t 	vm_memory_request(VM_Memory *memory, size_t size);
+
+void 		vm_sched_init(VM_Sched *sched);
+VM_Thread 	*vm_thread_create(VM_Sched *sched, VM_Operand *entry_point, VM_Operand *entry_args);
+void 		vm_schedule_threads(VM_Sched *sched);
+void 		vm_sched_dump(VM_Sched *sched);
 
 #endif

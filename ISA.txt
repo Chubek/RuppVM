@@ -17,7 +17,6 @@ pun2addr 	( v -- vaddr )		; Pun v to vaddr
 
 ; Control flow operations
 call		( vaddr vnum --  )      ; Call function at address vaddr, passing  vnum items on stack
-extcall		( vmem vnum --  )	; Call external function at vmem, passing  vnum items on stack
 jmp             ( vaddr --  )           ; Perform an unconditional jump to address vaddr
 jmpz		( vaddr v -- )		; Jump to vaddr if v is 0
 jmpnz		( vaddr v -- )		: Jump to vaddr if v is not 0
@@ -69,5 +68,27 @@ mem_dump	( vmem vnum -- )	 ; Dump memory vmem that is vnum in size
 mem_set		( vmem vnum v -- )	 ; Set memory vmem at index vnum to v
 coll_frame	( -- )			 ; Collect on stack frame
 coll_stack	( -- )			 ; Collect on entire stack
+
+; JIT, Meta
+eval_static 	( vaddr vnum -- )	 ; Evaluate static RuppVM code, starting at vaddr, picking up vnum opcodes
+eval_dynamic	( vmem vnum -- )	 ; Same with eval_static, except code is residing at memory
+exec_static	( vaddr vnum -- )	 ; Same with eval_static, except executes control flow instructions
+exec_dynamic    ( vmem vnum -- ) 	 ; Same as exec_static, except executes control flow instructions
+compile_static	( vaddr vnum -- )	 ; Compiles static RuppVM code to native machine code
+compile_dynamic ( vmem vnum -- )	 ; Same as eval_static, except code resides at memory
+
+; FFI
+hook_ext_ret	( vmem vnum1 -- vnum2 )	 ; Hook external function at vmem, accepting vnum1 args -- the identifier is pushed as vnum2
+hook_ext_noret  ( vmem vnum1 -- vnum2 )  ; Same as hook_ext_ret, except for functions that return no value (ex. void functions in C)
+hook_extv_ret	( vmem -- vnum )	 ; hook_ext_ret for variadic functions
+hook_extv_noret ( vmem -- vnum )	 ; hook_ext_noret for variadic functions
+call_ext_ret	( vnum -- v )		 ; Call registered external function with identifier vnum, returning v
+call_ext_noret	( vnum -- )		 ; Call regeistered external function with identifier vnum, returning none
+call_extv_ret	( vnum -- v )		 ; call_ext_ret for variadic functions
+call_extv_noret	( vnum -- )		 ; call_ext_noret for variadic functions
+
+
+
+
 
 

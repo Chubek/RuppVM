@@ -1,0 +1,74 @@
+load_const      ( -- value)        ; Push a constant onto the stack.
+store           (value -- )        ; Pop the top stack value and store it in a local variable.
+load            ( -- value)        ; Push the value of a local variable onto the stack.
+add             (value1 value2 -- result) ; Pop two values, add them, and push the result.
+subtract        (value1 value2 -- result) ; Pop two values, subtract the second from the first, and push the result.
+multiply        (value1 value2 -- result) ; Pop two values, multiply them, and push the result.
+divide          (value1 value2 -- result) ; Pop two values, divide the first by the second, and push the result.
+jump            ( -- )             ; Perform an unconditional jump.
+jump_if_true    (flag -- )         ; Pop a boolean and jump if true.
+jump_if_false   (flag -- )         ; Pop a boolean and jump if false.
+call_function   (argN ... arg1 n -- result) ; Pop n+1 arguments (where n is the number of function arguments), call the function, and push the result.
+return          (value -- )        ; Return from a function, pushing the return value onto the caller's stack.
+create_array    (valueN ... value1 n -- array) ; Pop n values, create an array of these values, and push it.
+create_map      (keyN valueN ... key1 value1 n -- map) ; Pop 2n values forming n key-value pairs, create a map, and push it.
+invoke_dynamic  (object method_id -- result) ; Pop an object and a method identifier, dynamically invoke the method on the object, and push the result.
+load_global     ( -- value)        ; Push a global variable's value onto the stack.
+store_global    (value -- )        ; Pop the top stack value and store it in a global variable.
+load_index      (array index -- value) ; Pop an array and an index, push the element at that index.
+store_index     (array index value -- ) ; Pop a value, an index, and an array, and store the value at that index in the array.
+not             (value -- result)  ; Pop a value, apply logical negation, and push the result.
+and             (value1 value2 -- result) ; Pop two boolean values, perform logical AND, and push the result.
+or              (value1 value2 -- result) ; Pop two boolean values, perform logical OR, and push the result.
+xor             (value1 value2 -- result) ; Pop two boolean values, perform logical XOR, and push the result.
+shift_left      (value count -- result) ; Pop a value and a shift count, shift left, and push the result.
+shift_right     (value count -- result) ; Pop a value and a shift count, shift right, and push the result.
+throw           (exception -- )    ; Pop an exception object and throw it.
+catch           ( -- exception)    ; Catch an exception and push it onto the stack.
+create_thread   (function -- thread) ; Pop a function, create a new thread to run it, and push the thread reference.
+join_thread     (thread -- result) ; Pop a thread reference, wait for the thread to finish, and push the result.
+yield           ( -- )             ; Yield execution to allow other threads or processes to run.
+sync            ( -- )             ; Perform a synchronization barrier.
+lock            (mutex -- )        ; Acquire a lock on the mutex.
+unlock          (mutex -- )        ; Release the lock on the mutex.
+increment       (value -- result)  ; Increment an integer value by one and push the result.
+decrement       (value -- result)  ; Decrement an integer value by one and push the result.
+compare         (value1 value2 -- result) ; Pop two values, compare them, and push the comparison result (-1, 0, 1).
+equal           (value1 value2 -- result) ; Pop two values, test for equality, and push the boolean result (true/false).
+greater_than    (value1 value2 -- result) ; Pop two values, test if the first is greater than the second, and push the result.
+less_than       (value1 value2 -- result) ; Pop two values, test if the first is less than the second, and push the result.
+sqrt            (value -- result)  ; Calculate the square root of the top stack value and push the result.
+pow             (base exponent -- result) ; Pop a base and an exponent, compute the power, and push the result.
+sin             (angle -- result)  ; Compute the sine of the top stack value (angle in radians) and push the result.
+cos             (angle -- result)  ; Compute the cosine of the top stack value (angle in radians) and push the result.
+tan             (angle -- result)  ; Compute the tangent of the top stack value (angle in radians) and push the result.
+exp             (value -- result)  ; Compute the exponential (e^value) of the top stack value and push the result.
+log             (value -- result)  ; Compute the natural logarithm of the top stack value and push the result.
+array_length    (array -- length)  ; Pop an array and push its length.
+concat          (string1 string2 -- result) ; Pop two strings, concatenate them, and push the result.
+substr          (string start length -- result) ; Pop a string, a start index, and a length, then push the substring result.
+convert_to_int  (value -- result)  ; Convert the top stack value to an integer.
+convert_to_float(value -- result)  ; Convert the top stack value to a float.
+dup             (value -- value value) ; Duplicate the top value on the stack.
+drop            (value -- )        ; Remove the top value from the stack.
+swap            (value1 value2 -- value2 value1) ; Swap the top two values on the stack.
+over            (value1 value2 -- value1 value2 value1) ; Duplicate the second item on the stack over the top item.
+rot             (value1 value2 value3 -- value2 value3 value1) ; Rotate the top three stack values.
+pick            (n -- value)       ; Copy the nth item from the top of the stack to the top.
+loop_start      (count -- )        ; Mark the start of a loop which will iterate 'count' times.
+loop_end        ( -- )             ; Jump back to the corresponding loop_start if iterations remain.
+if_start        (condition -- )    ; If the condition is true, continue, otherwise jump to matching if_end.
+if_end          ( -- )             ; Mark the end of an if block.
+while_start     ( -- )             ; Mark the start of a while loop.
+while_condition (condition -- )    ; Check the condition; if false, jump to while_end, else continue.
+while_end       ( -- )             ; Jump back to while_start.
+call_external   (argN ... arg1 n address -- result) ; Call an external function with n arguments.
+nop             ( -- )             ; No operation, used for timing or synchronization purposes.
+enter           ( -- )             ; Enter a new function, setting up the stack frame.
+leave           ( -- )             ; Leave a function, cleaning up the stack frame.
+alloc           (size -- address)  ; Allocate a block of memory of 'size' and return its address.
+free            (address -- )      ; Free a previously allocated block of memory.
+mem_copy        (src dest size -- ) ; Copy 'size' bytes from 'src' to 'dest'.
+assert          (condition -- )    ; Assert that a condition is true, otherwise throw an error.
+debug           ( -- )             ; Trigger a debug operation, such as breakpoint in a debugger.
+

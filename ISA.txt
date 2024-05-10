@@ -1,6 +1,6 @@
 ; Stack operations
 push_word	( &word -- vword )				; Push a word constant onto the stack
-push_addr	( &addr -- vaddr )				; Push a stack address onto the stack
+push_addr	( &addr -- vaddr )				; Push a stack address onto the stack 
 push_mem	( &mem -- vmem )				; Push a memory address onto the stack
 lit_num		( vtos -- vword )				; Pun vtos to vword
 lit_mem		( vtos -- vmem )				; Pun vtos to vmem
@@ -11,7 +11,9 @@ swap            ( vtos1 vtos2 -- vtos2 vtos1)			; Swap the top two values on the
 over            ( vtos1 vtos2 -- vtos1 vtos2 vtos1) 		; Duplicate the second item on the stack over the top item
 rot2            ( vtos1 vtos2 -- vtos2 vtos1) 			; Rotate the top two stack values
 rot3            ( vtos1 vtos2 vtos3 -- vtos2 vtos3 vtos1)	; Rotate the top three stack values
-pick            ( vword -- v)       				; Copy the nth item from the top of the stack to the top
+pick            ( vword -- v)       				; Copy the nth item from the top of the stack to vword
+bless		( vaddr1 vaddr2 -- vmem )			; Bless (vaddr1, vaddr2) into chunk, return vmem handle
+
 
 ; Control flow operations
 call		( vaddr vword --  )    				; Call function at address vaddr, passing  vword items on stack

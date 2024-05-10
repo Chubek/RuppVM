@@ -20,6 +20,7 @@ typedef struct VM_Sched 	VM_Sched;
 typedef struct VM_Arena 	VM_Arena;
 typedef struct VM_Memory 	VM_Memory;
 typedef struct VM_State 	VM_State;
+typedef struct VM_Extern	VM_Extern;
 typedef struct VM_Exec		VM_Exec;
 
 struct VM_Operand
@@ -111,6 +112,15 @@ struct VM_Memory
    VM_Arena *head;
 };
 
+struct VM_Extern
+{
+   uintptr_t 	entrypoint;
+   ssize_t 	num_params;
+   bool 	returns;
+
+   VM_Extern    *next_in_exec;
+};
+
 struct VM_State
 {
    VM_Sched 	*sched;
@@ -121,9 +131,8 @@ struct VM_State
 struct VM_Exec
 {
    VM_State 	*state;
-   FILE		*in_stream;
-   FILE		*out_stream;
-   FILE 	*err_stream;
+   VM_Extern	*hooked_externs;
+   VM_Handle	*handle_tbl;	// To be implemented
 };
 
 

@@ -15,6 +15,7 @@ typedef uintmax_t vm_tag_t;
 
 typedef struct VM_Operand 	VM_Operand;
 typedef struct VM_Stack 	VM_Stack;
+typedef struct VM_TestFn	VM_TestFn;
 typedef struct VM_Frame		VM_Frame;
 typedef struct VM_Thread 	VM_Thread;
 typedef struct VM_Sched 	VM_Sched;
@@ -24,6 +25,10 @@ typedef struct VM_State 	VM_State;
 typedef struct VM_Extern	VM_Extern;
 typedef struct VM_Bundle	VM_Bundle;
 typedef struct VM_Exec		VM_Exec;
+
+typedef bool (*unfn_t)(VM_Operand*);
+typedef bool (*binfn_t)(VM_Operand*, VM_Operand*);
+typedef bool (*collfn_t)(VM_Operand*, size_t size);
 
 struct VM_Operand
 {
@@ -44,14 +49,38 @@ struct VM_Operand
   }
   kind;
 
+  enum
+  {
+    ST_STATIC,
+    ST_MEMORY,
+    ST_THREAD_LOCAL,
+  }
+  storage;
+
   vm_ident_t 	operand_id;
   vm_tag_t	operand_tag;
 
   bool is_alive;
-  bool is_static;
-  bool is_thread_local;
   
   VM_Operand *next_in_frame;
+};
+
+struct TestFn
+{
+   union
+   {
+      unfn_t 	*unary_fn;
+      binfn_t	*binary_fn;
+      collfn_t	*coll_fn;
+   };
+
+   enum
+   {
+       TST_UNARY,
+       TST_BINARY,
+       TST_COLL,
+   }
+   kind;
 };
 
 struct VM_Frame
@@ -59,7 +88,11 @@ struct VM_Frame
    VM_Operand 	*root_operand;
    VM_Operand 	*head_operand;
    VM_Operand	**tos_operand;
+   VM_Operand   **ip_operand;
    size_t 	num_operands;
+
+   bool 	is_critial;
+   vm_ident_t	current_holder;
 
    vm_ident_t 	frame_id;
    VM_Frame 	*next_in_stack;
@@ -71,6 +104,7 @@ struct VM_Stack
    VM_Frame 	*root_frame;
    VM_Frame 	*head_frame;
    VM_Operand 	**tos_operand;
+   VM_Operand	**ip_operand;
    size_t 	num_frames;
 };
 
@@ -91,7 +125,8 @@ struct VM_Thread
    }
    state;
 
-   VM_Thread *next_in_sched;
+   bool		global;
+   VM_Thread 	*next_in_sched;
 };
 
 struct VM_Sched
@@ -105,14 +140,14 @@ struct VM_Arena
 {
    uint8_t 	*buffer;
    size_t 	capacity;
-   size_t 	used;
+   size_t 	used_up;
    VM_Arena 	*next_in_memory;
 };
 
 struct VM_Memory
 {
-   VM_Arena *root;
-   VM_Arena *head;
+   VM_Arena *root_region;
+   VM_Arena *head_region;
 };
 
 struct VM_Extern
@@ -172,6 +207,13 @@ vm_ident_t	vm_stack_push_inst(VM_Stack *stack, int64_t inst_value, vm_tag_t tag)
 VM_Operand 	*vm_stack_pop(VM_Stack *stack);
 VM_Operand 	*vm_stack_get(VM_Stack *stack, vm_ident_t ident);
 void 		vm_stack_dump(VM_Stack *stack);
+
+void		vm_stack_set_ip(VM_Stack *stack, VM_Operand *new_ip);
+VM_Operand	*vm_stack_get_ip(VM_Stack *stack);
+VM_Operand	*vm_stack_get_tos(VM_Stack *stack);
+
+bool		vm_stack_test_tos(VM_Stack *stack, VM_TestFn *testfn);
+bool		vm_stack_test_ident(VM_Stack *stack, VM_TestFn *testfn, vm_ident_t ident_start);
 
 VM_Arena 	*vm_arena_new(size_t size);
 void 		vm_arena_dump_all(VM_Arena *arena);

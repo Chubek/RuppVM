@@ -21,7 +21,7 @@ typedef struct VM_Arena 	VM_Arena;
 typedef struct VM_Memory 	VM_Memory;
 typedef struct VM_State 	VM_State;
 typedef struct VM_Extern	VM_Extern;
-typedef struct VM_Handle	VM_Handle;
+typedef struct VM_Bundle	VM_Bundle;
 typedef struct VM_Exec		VM_Exec;
 
 struct VM_Operand
@@ -122,9 +122,22 @@ struct VM_Extern
    VM_Extern    *next_in_exec;
 };
 
-struct VM_Handle
+struct VM_Bundle
 {
-   // TODO
+   VM_Opcode 	*start;
+   VM_Opcode 	*end;
+   VM_Opcode 	*tag;
+   size_t  	length;
+   vm_ident_t	bundle_id;
+
+   enum
+   {
+      BUN_STATIC,
+      BUN_DYNAMIC,
+   }
+   kind;
+
+   VM_Bundle 	*next;
 };
 
 struct VM_State
@@ -138,7 +151,7 @@ struct VM_Exec
 {
    VM_State 	*state;
    VM_Extern	*hooked_externs;
-   VM_Handle	*handle_tbl;	// To be implemented
+   VM_Bundle	*bundles_tbl;
 };
 
 

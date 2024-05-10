@@ -1,27 +1,32 @@
 ; Stack operations
-load_const      ( -- v)        		; Push a constant onto the stack
-store           ( v -- )       		; Pop the top stack v and store it in a local variable
-load            ( -- v)        		; Push the v of a local variable onto the stack
-dup             ( v -- v v)  		; Duplicate the top v on the stack
-drop            ( v -- )        	; Remove the top v from the stack
-swap            ( v1 v2 -- v2 v1)	; Swap the top two vs on the stack
+push_const	( &const -- vnum )	; Push a constant onto the stack
+push_addr	( &addr -- vaddr )	; Push a stack address onto the stack
+push_mem	( &mem -- vmem )	; Push a memory address onto the stack
+pop_2addr	( vaddr &addr -- )	; Pop a value at address v and store it at stack address &addr
+pop_2mem	( vaddr &mem -- )	; Pop a value at address v and store it at memory address &mem
+dup             ( v -- v1 v2)  		; Duplicate the top value on the stack
+drop            ( v -- )        	; Remove the top value from the stack
+swap            ( v1 v2 -- v2 v1)	; Swap the top two values on the stack
 over            ( v1 v2 -- v1 v2 v1) 	; Duplicate the second item on the stack over the top item
-rot2            ( v1 v2 -- v2 v1) 	; Rotate the top two stack vs
-rot3            ( v1 v2 v3 -- v2 v3 v1) ; Rotate the top three stack vs
-pick            ( n -- v)       	;Copy the nth item from the top of the stack to the top
+rot2            ( v1 v2 -- v2 v1) 	; Rotate the top two stack values
+rot3            ( v1 v2 v3 -- v2 v3 v1) ; Rotate the top three stack values
+pick            ( vnum -- v)       	; Copy the nth item from the top of the stack to the top
+pun2num		( v -- vnum )		; Pun v to vnum
+pun2mem		( v -- vmem )		; Pun v to vmem
+pun2addr 	( v -- vaddr )		; Pun v to vaddr
 
 ; Control flow operations
-call		( v n --  )	        ; Call function at address v, passing n items on stack
-extcall		( v n --  )	        ; Call external function at v, passing n items on stack
-jmp             ( v --  )      	        ; Perform an unconditional jump to address v
-jmpz		( v1 v2 -- )		; Jump to v1 if v2 is 0
-jmpnz		( v1 v2 -- )		: Jump to v1 if v2 is not 0
-jmpeq		( v1 v2 v3 -- )  	; Jump to v1 if v2 equals v3
-jmpne		( v1 v2 v3 -- )		; Jump to v1 if v2 does not equal v3
-jmplt		( v1 v2 v3 -- )		; Jump to v1 if v2 is lesser than v3
-jmple		( v1 v2 v3 -- )		; Jump to v1 if v2 is lesser/equal than/to v3
-jmpgt		( v1 v2 v3 -- )		; Jump to v1 if v2 is greater than v3
-jmpge		( v1 v2 v3 -- )		; Jump to v1 if v2 is greater/equal than/to v3
+call		( vaddr vnum --  )      ; Call function at address vaddr, passing  vnum items on stack
+extcall		( vmem vnum --  )	; Call external function at vmem, passing  vnum items on stack
+jmp             ( vaddr --  )           ; Perform an unconditional jump to address vaddr
+jmpz		( vaddr v -- )		; Jump to vaddr if v is 0
+jmpnz		( vaddr v -- )		: Jump to vaddr if v is not 0
+jmpeq		( vaddr v1 v2 -- )  	; Jump to vaddr if v1 equals v2
+jmpne		( vaddr v1 v2 -- )	; Jump to vaddr if v1 does not equal v2
+jmplt		( vaddr v1 v2 -- )	; Jump to vaddr if v1 is lesser than v2
+jmple		( vaddr v1 v2 -- )	; Jump to vaddr if v1 is lesser than, or equal to, v2
+jmpgt		( vaddr v1 v2 -- )	; Jump to vaddr if v1 is greater than v2
+jmpge		( vaddr v1 v2 -- )	; Jump to vaddr if v1 is greater than, or equal to, v2
 skipz           ( v -- )                ; Skip next op if v is 0
 skipnz          ( v -- )                : Skip next op if v is not
 skipeq          ( v1 v2 -- )            ; Skip next op if v1 equals v2
@@ -30,11 +35,11 @@ skiplt          ( v1 v2 -- )            ; Skip next op if v1 is lesser than v2
 skiple          ( v1 v2 -- )            ; Skip next op if v2 is lesser/equal than/to v2
 skipgt          ( v1 v2 -- )            ; Skip next op if v1 is greater than v2
 skipge          ( v1 v2 -- )            ; Skip next op if v1 is greater/equal than/to v2
-enter		(  --  )		; Enter function, create a new stack frame
-leave		(  --  )		; Leave function, destroy stack frame
-nop		(  --  )                ; No operation
+enter_frm	(  --  )		; Enter local frame, and create a new stack frame
+leave_frm	(  --  )		; Leave local frame, and discard the old stack frame
 enter_crit	(  --  )		; Entering critical execution zone
 exit_crit	(  --  )		; Exiting critical execution zone
+nop		(  --  )                ; No operation
 
 ; Arithmetic operations
 add		( v1 v2 -- v )		; Add v1 to v2
@@ -50,13 +55,19 @@ shr		( v1 v2 -- v )		; Right-shift v1 v2 times
 shl		( v1 v2 -- v )		; Left-shift v1 v2 times
 
 ; Thread operations
-mk_thrd	        ( v -- vthread )         ; Creates a new green thread with address v, returns handle as vthread
-join_thrd	( vthread --   )	 ; Wait until vthread joins
+mk_thrd	        ( v -- vmem )            ; Creates a new green thread with address v, returns handle as vmem
+join_thrd	( vmem --   )	 	 ; Wait until thread at vmem joins
 wait_thrd	( -- )			 ; Wait until current thread finishes
 yield_thrd	( -- )			 ; Yield the execution of current thread, let the scheduler bring up next availalbe thread
-lock_req  	( vzone -- vgrant )	 ; Request access to critical zone at address 'vzone', returns 'vgrant' as permission
-lock_acc	( vzone vgrant -- )	 ; Acquire a lock at critical zone 'vzone' with grant 'vgrant'
-lock_rls	( vgrant -- )		 ; Release lock associated with 'vgrant'
+lock_req  	( vaddr -- vmem )	 ; Request access to critical zone at address 'vaddr', returns 'vmem' as permission handle
+lock_acc	( vaddr vmem -- )	 ; Acquire a lock at critical zone 'vaddr' with grant 'vmem'
+lock_rls	( vmem -- )		 ; Release lock associated with 'vmem' handle
 
+; Memory & GC Operations
+mem_req		( vnum -- vmem )	 ; Request memory vnum size in bytes
+mem_dump	( vmem vnum -- )	 ; Dump memory vmem that is vnum in size
+mem_set		( vmem vnum v -- )	 ; Set memory vmem at index vnum to v
+coll_frame	( -- )			 ; Collect on stack frame
+coll_stack	( -- )			 ; Collect on entire stack
 
 

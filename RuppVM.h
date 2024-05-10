@@ -54,6 +54,7 @@ struct VM_Frame
 {
    VM_Operand 	*root_operand;
    VM_Operand 	*head_operand;
+   VM_Operand	**tos_operand;
    size_t 	num_operands;
 
    vm_ident_t 	frame_id;
@@ -63,9 +64,10 @@ struct VM_Frame
 
 struct VM_Stack
 {
-   VM_Frame *root_frame;
-   VM_Frame *head_frame;
-   size_t num_frames;
+   VM_Frame 	*root_frame;
+   VM_Frame 	*head_frame;
+   VM_Operand 	**tos_operand;
+   size_t 	num_frames;
 };
 
 
@@ -119,8 +121,6 @@ struct VM_State
 struct VM_Exec
 {
    VM_State 	*state;
-   VM_Operand 	**stack_top;
-   VM_Operand	**current_inst;
    FILE		*in_stream;
    FILE		*out_stream;
    FILE 	*err_stream;

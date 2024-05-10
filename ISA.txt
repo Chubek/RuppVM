@@ -12,8 +12,9 @@ over            ( vtos1 vtos2 -- vtos1 vtos2 vtos1) 		; Duplicate the second ite
 rot2            ( vtos1 vtos2 -- vtos2 vtos1) 			; Rotate the top two stack values
 rot3            ( vtos1 vtos2 vtos3 -- vtos2 vtos3 vtos1)	; Rotate the top three stack values
 pick            ( vword -- v)       				; Copy the nth item from the top of the stack to vword
-bless		( vaddr1 vaddr2 -- vmem )			; Bless (vaddr1, vaddr2) into chunk, return vmem handle
 
+; Bless operations
+; Todo
 
 ; Control flow operations
 call		( vaddr vword --  )    				; Call function at address vaddr, passing  vword items on stack
@@ -26,20 +27,16 @@ jmplt		( vaddr vtos1 vtos2 -- )			; Jump to vaddr if vtos1 is lesser than vtos2
 jmple		( vaddr vtos1 vtos2 -- )			; Jump to vaddr if vtos1 is lesser than, or equal to, vtos2
 jmpgt		( vaddr vtos1 vtos2 -- )			; Jump to vaddr if vtos1 is greater than vtos2
 jmpge		( vaddr vtos1 vtos2 -- )			; Jump to vaddr if vtos1 is greater than, or equal to, vtos2
-skipz           ( vtos -- )            				; Skip next op if vtos is 0
-skipnz          ( vtos -- )             			; Skip next op if vtos is not
-skipeq          ( vtos1 vtos2 -- )           			; Skip next op if vtos1 equals vtos2
-skipne          ( vtos1 vtos2 -- )           			; Skip next op if vtos1 does not equal vtos2
-
-skiplt          ( vtos1 vtos2 -- )           			; Skip next op if vtos1 is lesser than vtos2
-skiple          ( vtos1 vtos2 -- )           			; Skip next op if vtos2 is lesser/equal than/to vtos2
-skipgt          ( vtos1 vtos2 -- )           			; Skip next op if vtos1 is greater than vtos2
-skipge          ( vtos1 vtos2 -- )           			; Skip next op if vtos1 is greater/equal than/to vtos2
-enter_frm	(  --  )					; Enter local frame, and create a new stack frame
-leave_frm	(  --  )					; Leave local frame, and discard the old stack frame
-enter_crit	(  --  )					; Entering critical execution zone
-exit_crit	(  --  )					; Exiting critical execution zone
+enter_fr	(  --  )					; Enter local frame, and create a new stack frame
+leave_fr	(  --  )					; Leave local frame, and discard the old stack frame
+enter_cz	(  --  )					; Entering critical execution zone
+exit_cz		(  --  )					; Exiting critical execution zone
 nop		(  --  )               				; No operation
+unwind		(  --  )					; Unwind the stack unconditionally
+unwindz		( vtos -- )					; Unwind if vtos if 0
+unwindnz	( vtos -- )					; Unwind if vtos not 0
+throw_static	( vaddr -- )					; Throw static exception
+throw_dynamic   ( vmem -- )					; Throw dynamic exception
 
 ; Arithmetic operations
 add		( vtos1 vtos2 -- vtos )				; Add vtos1 to vtos2

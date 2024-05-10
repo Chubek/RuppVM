@@ -11,6 +11,7 @@
 #include <time.h>
 
 typedef uintmax_t vm_ident_t;
+typedef uintmax_t vm_tag_t;
 
 typedef struct VM_Operand 	VM_Operand;
 typedef struct VM_Stack 	VM_Stack;
@@ -43,7 +44,8 @@ struct VM_Operand
   }
   kind;
 
-  vm_ident_t operand_id;
+  vm_ident_t 	operand_id;
+  vm_tag_t	operand_tag;
 
   bool is_alive;
   bool is_static;
@@ -126,9 +128,10 @@ struct VM_Bundle
 {
    VM_Opcode 	*start;
    VM_Opcode 	*end;
-   VM_Opcode 	*tag;
    size_t  	length;
+
    vm_ident_t	bundle_id;
+   vm_tag_t 	bundle_tag;
 
    enum
    {
@@ -154,6 +157,7 @@ struct VM_Exec
    VM_Bundle	*bundles_tbl;
 };
 
+vm_ident_t	vm_ident_hash(void *addr, size_t size);
 
 void 		vm_frame_dump_all(VM_Frame *frame);
 VM_Operand	*vm_frame_get_operand(VM_Frame *frame, vm_ident_t ident);
@@ -161,12 +165,12 @@ VM_Operand	*vm_frame_get_operand(VM_Frame *frame, vm_ident_t ident);
 vm_ident_t 	vm_stack_stackup_frame(VM_Stack *stack);
 VM_Frame	*vm_stack_get_frame(VM_Stack *stack, vm_ident_t frame_id);
 
-vm_ident_t 	vm_stack_push_const(VM_Stack *stack, intmax_t const_value);
-vm_ident_t 	vm_stack_push_addr(VM_Stack *stack, ptrdiff_t addr_value);
-vm_ident_t 	vm_stack_push_mem(VM_Stack *stack, uintptr_t mem_value);
-vm_ident_t	vm_stack_push_inst(VM_Stack *stack, int64_t inst_value);
+vm_ident_t 	vm_stack_push_const(VM_Stack *stack, intmax_t const_value, vm_tag_t tag);
+vm_ident_t 	vm_stack_push_addr(VM_Stack *stack, ptrdiff_t addr_value, vm_tag_t tag);
+vm_ident_t 	vm_stack_push_mem(VM_Stack *stack, uintptr_t mem_value, vm_tag_t tag);
+vm_ident_t	vm_stack_push_inst(VM_Stack *stack, int64_t inst_value, vm_tag_t tag);
 VM_Operand 	*vm_stack_pop(VM_Stack *stack);
-VM_Operand 	*vm_stack_get(VM_Stack *stack, vm_ident_t operand_ident);
+VM_Operand 	*vm_stack_get(VM_Stack *stack, vm_ident_t ident);
 void 		vm_stack_dump(VM_Stack *stack);
 
 VM_Arena 	*vm_arena_new(size_t size);

@@ -20,6 +20,8 @@ id_dynamic	( vtos -- vword ) 			  ; Get the dynamic memory address of an object
 ; Bless operations
 bless_static	( vaddr vword1 vword2 -- vmem )		 ; Bless vword1 items starting from vaddr, tag vword2 returns handle as vmem
 bless_dynamic	( vmem1 vword1 vword2 -- vmem2 )	 ; The dynamic, memory-based bless
+bless1_dynamic	( vaddr vword -- vmem )			 ; Bless just one static cell
+bless1_static   ( vmem vword -- vmem )			 ; Bless just one dyamic cell
 bless_dup	( vmem1 -- vmem2 )			 ; Duplicate blessed bundle
 
 ; Control flow operations
@@ -43,6 +45,7 @@ unwindz		( vtos -- )				; Unwind if vtos if 0
 unwindnz	( vtos -- )				; Unwind if vtos not 0
 throw_static	( vaddr -- )				; Throw static exception
 throw_dynamic   ( vmem -- )				; Throw dynamic exception
+interrupt	( vmem vword -- )			; Send interrupt nr vword thead handle vmem
 
 ; Arithmetic operations
 add		( vtos1 vtos2 -- vtos )			; Add vtos1 to vtos2
@@ -83,16 +86,18 @@ compile_static	( vaddr vword -- )			; Compiles static RuppVM code to native mach
 compile_dynamic ( vmem vword -- )			; Same as eval_static, except code resides at memory
 exec_stack	( -- )					; Execute stack up to the point
 
-; FFI
-hook_ext_ret	( vmem1 vword -- vmem2 )		; Hook external function at vmem, with numbered args, that return value
-hook_ext_noret  ( vmem1 vword -- vmem2 )		; Hook external function at vmem, with numbered args, that return void
-hook_extv_ret	( vmem1 -- vmem2 )	 		; hook_ext_ret for variadic functions
-hook_extv_noret ( vmem1 -- vmem2 )	 		; hook_ext_noret for variadic functions
-call_ext_ret	( vmem1 -- vtos )	 		; Call registered external function with identifier vword, returning v
-call_ext_noret	( vmem -- )		 		; Call regeistered external function with identifier vword, returning none
-call_extv_ret	( vmem vword -- vtos )			; call_ext_ret for variadic functions with vword args
-call_extv_noret	( vmem vword -- )			; call_ext_noret for variadic functions with vword args
-mk_syscall	( vword1 vword2 -- vtos )		; Make system call to nr vword1, passing vword2 args, result vtos (UNIX only)
+; FFI, Hooks
+hook_int_static  ( vaddr vword  --  )			; Hook interrupt nr vword to vaddr, throws error if nmi
+hook_int_dynamic ( vmem vowrd -- )			; Hook interrupt nr vword to vmemm, throws error if nmi
+hook_ext_ret	 ( vmem1 vword -- vmem2 )		; Hook external function at vmem, with numbered args, that return value
+hook_ext_noret   ( vmem1 vword -- vmem2 )		; Hook external function at vmem, with numbered args, that return void
+hook_extv_ret	 ( vmem1 -- vmem2 )	 		; hook_ext_ret for variadic functions
+hook_extv_noret  ( vmem1 -- vmem2 )	 		; hook_ext_noret for variadic functions
+call_ext_ret	 ( vmem1 -- vtos )	 		; Call registered external function with identifier vword, returning v
+call_ext_noret	 ( vmem -- )		 		; Call regeistered external function with identifier vword, returning none
+call_extv_ret	 ( vmem vword -- vtos )			; call_ext_ret for variadic functions with vword args
+call_extv_noret	 ( vmem vword -- )			; call_ext_noret for variadic functions with vword args
+mk_syscall	 ( vword1 vword2 -- vtos )		; Make system call to nr vword1, passing vword2 args, result vtos (UNIX only)
 
 
 

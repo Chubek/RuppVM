@@ -21,6 +21,7 @@ typedef struct VM_Arena 	VM_Arena;
 typedef struct VM_Memory 	VM_Memory;
 typedef struct VM_State 	VM_State;
 typedef struct VM_Extern	VM_Extern;
+typedef struct VM_Handle	VM_Handle;
 typedef struct VM_Exec		VM_Exec;
 
 struct VM_Operand
@@ -119,6 +120,11 @@ struct VM_Extern
    bool 	returns;
 
    VM_Extern    *next_in_exec;
+};
+
+struct VM_Handle
+{
+   // TODO
 };
 
 struct VM_State

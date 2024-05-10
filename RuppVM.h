@@ -20,6 +20,7 @@ typedef struct VM_Sched 	VM_Sched;
 typedef struct VM_Arena 	VM_Arena;
 typedef struct VM_Memory 	VM_Memory;
 typedef struct VM_State 	VM_State;
+typedef struct VM_Exec		VM_Exec;
 
 struct VM_Operand
 {
@@ -28,6 +29,7 @@ struct VM_Operand
     uintptr_t 	mem_value;
     intmax_t 	const_value;
     ptrdiff_t 	addr_value;
+    int64_t	inst_value;
   };
 
   enum
@@ -35,6 +37,7 @@ struct VM_Operand
     OP_MEM,
     OP_CONST,
     OP_ADDR,
+    OP_INST,
   }
   kind;
 
@@ -43,19 +46,18 @@ struct VM_Operand
   bool is_alive;
   bool is_static;
   bool is_thread_local;
-  bool is_opcode;
   
-  VM_Operand *next;
+  VM_Operand *next_in_frame;
 };
 
 struct VM_Frame
 {
-   VM_Operand *root_operand;
-   VM_Operand *head_operand;
+   VM_Operand 	*root_operand;
+   VM_Operand 	*head_operand;
+   size_t 	num_operands;
 
-   vm_ident_t frame_id;
-   VM_Stack *next_in_frame;
-   size_t num_operands;
+   vm_ident_t 	frame_id;
+   VM_Frame 	*next_in_stack;
 };
 
 
@@ -114,6 +116,17 @@ struct VM_State
    VM_Stack 	*stack;
 };
 
+struct VM_Exec
+{
+   VM_State 	*state;
+   VM_Operand 	**stack_top;
+   VM_Operand	**current_inst;
+   FILE		*in_stream;
+   FILE		*out_stream;
+   FILE 	*err_stream;
+};
+
+
 void 		vm_frame_dump_all(VM_Frame *frame);
 VM_Operand	*vm_frame_get_operand(VM_Frame *frame, vm_ident_t ident);
 
@@ -123,6 +136,7 @@ VM_Frame	*vm_stack_get_frame(VM_Stack *stack, vm_ident_t frame_id);
 vm_ident_t 	vm_stack_push_const(VM_Stack *stack, intmax_t const_value);
 vm_ident_t 	vm_stack_push_addr(VM_Stack *stack, ptrdiff_t addr_value);
 vm_ident_t 	vm_stack_push_mem(VM_Stack *stack, uintptr_t mem_value);
+vm_ident_t	vm_stack_push_inst(VM_Stack *stack, int64_t inst_value);
 VM_Operand 	*vm_stack_pop(VM_Stack *stack);
 VM_Operand 	*vm_stack_get(VM_Stack *stack, vm_ident_t operand_ident);
 void 		vm_stack_dump(VM_Stack *stack);
@@ -141,5 +155,6 @@ void 		vm_schedule_threads(VM_Sched *sched);
 void 		vm_sched_dump(VM_Sched *sched);
 
 void		vm_state_init(VM_State *state);
+void 		vm_exec_init(VM_Exec *exec);
 
 #endif
